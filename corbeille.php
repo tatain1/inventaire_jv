@@ -3,8 +3,13 @@
 <?php include 'include/header.php' ?>
 
 <?php
+if (isLogged()) {
+  $id_user = $_SESSION['user']['id'];
+} else {
+  $id_user = 0;
+}
 // REQUETE D'AFFICHAGE
-$sql = "SELECT * FROM general WHERE status=0 ORDER BY console DESC";
+$sql = "SELECT * FROM general WHERE status=0 AND id_user= $id_user ORDER BY console DESC";
 $query = $pdo->prepare($sql);
 $query->execute();
 $jeux = $query->fetchAll();

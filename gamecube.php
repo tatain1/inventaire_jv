@@ -3,8 +3,12 @@
 <?php include 'include/header.php' ?>
 
 <?php
-// ecrire la requete
-$sql = 'SELECT * FROM general WHERE console = "gamecube" AND status = 1 ORDER BY nom ASC';
+if (isLogged()) {
+  $id_user = $_SESSION['user']['id'];
+} else {
+  $id_user = 0;
+}// ecrire la requete
+$sql = "SELECT * FROM general WHERE console = 'gamecube' AND status = 1 AND id_user = $id_user ORDER BY nom ASC";
 // preparer la requete
 $query = $pdo->prepare($sql);
 // executer la requete

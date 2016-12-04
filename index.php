@@ -3,10 +3,14 @@
 <?php include 'include/header.php' ?>
 
 <?php
-
+if (isLogged()) {
+  $id_user = $_SESSION['user']['id'];
+} else {
+  $id_user = 0;
+}
 
 // REQUETE D'AFFICHAGE
-$sql = "SELECT * FROM general WHERE status=1 ORDER BY created_at DESC LIMIT 5";
+$sql = "SELECT * FROM general WHERE status=1 AND id_user = $id_user ORDER BY created_at DESC LIMIT 5";
 $query = $pdo->prepare($sql);
 $query->execute();
 $crees = $query->fetchAll();
@@ -47,7 +51,7 @@ $crees = $query->fetchAll();
 
    <?php
    // REQUETE D'AFFICHAGE
-   $sql = "SELECT * FROM general WHERE status=1 ORDER BY modified_at DESC LIMIT 5";
+   $sql = "SELECT * FROM general WHERE status=1 AND id_user = $id_user ORDER BY modified_at DESC LIMIT 5";
    $query = $pdo->prepare($sql);
    $query->execute();
    $modifies = $query->fetchAll();
@@ -88,13 +92,13 @@ $crees = $query->fetchAll();
 
   <?php
   // REQUETE D'AFFICHAGE
-  $sql = "SELECT * FROM general WHERE console='nes' AND status=1";
+  $sql = "SELECT * FROM general WHERE console='nes' AND status=1 AND id_user = $id_user";
   $query = $pdo->prepare($sql);
   $query->execute();
   $nes = $query->fetchAll();
   $nes = count($nes);
 
-  $sql = "SELECT * FROM general WHERE console='gamecube' AND status=1";
+  $sql = "SELECT * FROM general WHERE console='gamecube' AND status=1 AND id_user = $id_user";
   $query = $pdo->prepare($sql);
   $query->execute();
   $gamecube = $query->fetchAll();

@@ -2,6 +2,11 @@
 <?php include 'include/fonctions.php' ?>
 
 <?php
+if (isLogged()) {
+  $id_user = $_SESSION['user']['id'];
+} else {
+  $id_user = 0;
+}
 
 $error=array();
 $success=false;
@@ -65,10 +70,11 @@ $success=false;
     }
     // SI TOUT EST OK => INSERT INTO
     if (count($error) == 0)  {
-      $sql = "INSERT INTO general (nom, console, boite, notice, fourreau, cale, status, note, created_at)
-              VALUES (:nom, :console, :boite, :notice, :fourreau, :cale, 1, :note, now())";
+      $sql = "INSERT INTO general (id_user, nom, console, boite, notice, fourreau, cale, status, note, created_at, modified_at)
+              VALUES (:id_user, :nom, :console, :boite, :notice, :fourreau, :cale, 1, :note, now(), now())";
       $query = $pdo->prepare($sql);
       // bind VALUES (protec injection SQL)
+      $query->bindValue(':id_user', $id_user, PDO::PARAM_INT);
       $query->bindValue(':nom', $jeu, PDO::PARAM_STR);
       $query->bindValue(':console', $console, PDO::PARAM_STR);
       $query->bindValue(':boite', $boite, PDO::PARAM_STR);
@@ -87,83 +93,88 @@ $success=false;
 <?php include 'include/header.php' ?>
 
 <?php
-if ($success == true) {
-  echo '<div class="container">
-          <div class="green">Jeu enregistré.</div><br/>
-          <a href="ajout.php">Enregistrer un nouveau jeu</a>
-        </div>';
-} else { ?>
+if (isLogged()) {
 
-  <div class="container formulaire">
-    <form method="POST" action="ajout.php">
+  if ($success == true) {
+    echo '<div class="container">
+            <div class="green">Jeu enregistré.</div><br/>
+            <a href="ajout.php">Enregistrer un nouveau jeu</a>
+          </div>';
+  } else { ?>
 
-      <label class="intitule" for="jeu">Nom du jeu :</label>
-      <input type="text" name="jeu" value="<?php if (!empty($_POST['jeu'])) { echo ($_POST['jeu']); } ?>"/><br>
-      <span class="error"><?php if (!empty($error['jeu'])) { echo ($error['jeu']); } ?></span><br />
+    <div class="container formulaire">
+      <form method="POST" action="ajout.php">
 
-      <label class="intitule" for="console">Plateforme :</label>
-      <select name="console" value="">
-        <option value="">---Choisir---</option>
-        <option value="NES" <?php if (!empty($_POST['console']) && $_POST['console'] === 'NES') { echo 'selected'; } ?>>NES</option>
-        <option value="N64" <?php if (!empty($_POST['console']) && $_POST['console'] === 'N64') { echo 'selected'; } ?>>N64</option>
-        <option value="gamecube" <?php if (!empty($_POST['console']) && $_POST['console'] === 'gamecube') { echo 'selected'; } ?>>GameCube</option>
-      </select><br>
-      <div class="spacer"></div>
-      <span class="error"><?php if (!empty($error['console'])) { echo ($error['console']); } ?></span><br />
+        <label class="intitule" for="jeu">Nom du jeu :</label>
+        <input type="text" name="jeu" value="<?php if (!empty($_POST['jeu'])) { echo ($_POST['jeu']); } ?>"/><br>
+        <span class="error"><?php if (!empty($error['jeu'])) { echo ($error['jeu']); } ?></span><br />
 
-      <label class="intitule" for="boite">Boite/boitier :</label>
-      <select name="boite" value="">
-        <option value="" >---Choisir---</option>
-        <option value="Present" <?php if (!empty($_POST['boite']) && $_POST['boite'] === 'Present') { echo 'selected'; } ?>>Present</option>
-        <option value="Absent" <?php if (!empty($_POST['boite']) && $_POST['boite'] === 'Absent') { echo 'selected'; } ?>>Absent</option>
-        <option value="Reproduction" <?php if (!empty($_POST['boite']) && $_POST['boite'] === 'Reproduction') { echo 'selected'; } ?>>Reproduction</option>
-        <option value="Non Concerné" <?php if (!empty($_POST['boite']) && $_POST['boite'] === 'Non Concerné') { echo 'selected'; } ?>>Non concerné</option>
-      </select><br>
-      <div class="spacer"></div>
-      <span class="error"><?php if (!empty($error['boite'])) { echo ($error['boite']); } ?></span><br />
+        <label class="intitule" for="console">Plateforme :</label>
+        <select name="console" value="">
+          <option value="">---Choisir---</option>
+          <option value="NES" <?php if (!empty($_POST['console']) && $_POST['console'] === 'NES') { echo 'selected'; } ?>>NES</option>
+          <option value="N64" <?php if (!empty($_POST['console']) && $_POST['console'] === 'N64') { echo 'selected'; } ?>>N64</option>
+          <option value="gamecube" <?php if (!empty($_POST['console']) && $_POST['console'] === 'gamecube') { echo 'selected'; } ?>>GameCube</option>
+        </select><br>
+        <div class="spacer"></div>
+        <span class="error"><?php if (!empty($error['console'])) { echo ($error['console']); } ?></span><br />
 
-      <label class="intitule" for="notice">Notice :</label>
-      <select name="notice" value="">
-        <option value="">---Choisir---</option>
-        <option value="Present" <?php if (!empty($_POST['notice']) && $_POST['notice'] === 'Present') { echo 'selected'; } ?>>Present</option>
-        <option value="Absent" <?php if (!empty($_POST['notice']) && $_POST['notice'] === 'Absent') { echo 'selected'; } ?>>Absent</option>
-        <option value="Reproduction" <?php if (!empty($_POST['notice']) && $_POST['notice'] === 'Reproduction') { echo 'selected'; } ?>>Reproduction</option>
-        <option value="Non Concerné" <?php if (!empty($_POST['notice']) && $_POST['notice'] === 'Non Concerné') { echo 'selected'; } ?>>Non concerné</option>
-      </select><br>
-      <div class="spacer"></div>
-      <span class="error"><?php if (!empty($error['notice'])) { echo ($error['notice']); } ?></span><br />
+        <label class="intitule" for="boite">Boite/boitier :</label>
+        <select name="boite" value="">
+          <option value="" >---Choisir---</option>
+          <option value="Present" <?php if (!empty($_POST['boite']) && $_POST['boite'] === 'Present') { echo 'selected'; } ?>>Present</option>
+          <option value="Absent" <?php if (!empty($_POST['boite']) && $_POST['boite'] === 'Absent') { echo 'selected'; } ?>>Absent</option>
+          <option value="Reproduction" <?php if (!empty($_POST['boite']) && $_POST['boite'] === 'Reproduction') { echo 'selected'; } ?>>Reproduction</option>
+          <option value="Non Concerné" <?php if (!empty($_POST['boite']) && $_POST['boite'] === 'Non Concerné') { echo 'selected'; } ?>>Non concerné</option>
+        </select><br>
+        <div class="spacer"></div>
+        <span class="error"><?php if (!empty($error['boite'])) { echo ($error['boite']); } ?></span><br />
 
-      <label class="intitule" for="fourreau">Fourreau :</label>
-      <select name="fourreau" value="">
-        <option value="">---Choisir---</option>
-        <option value="Nintendo" <?php if (!empty($_POST['fourreau']) && $_POST['fourreau'] === 'Nintendo') { echo 'selected'; } ?>>Nintendo</option>
-        <option value="Black" <?php if (!empty($_POST['fourreau']) && $_POST['fourreau'] === 'Black') { echo 'selected'; } ?>>Black</option>
-        <option value="Absent" <?php if (!empty($_POST['fourreau']) && $_POST['fourreau'] === 'Absent') { echo 'selected'; } ?>>Absent</option>
-        <option value="Non Concerné" <?php if (!empty($_POST['fourreau']) && $_POST['fourreau'] === 'Non Concerné') { echo 'selected'; } ?>>Non concerné</option>
-      </select><br>
-      <div class="spacer"></div>
-      <span class="error"><?php if (!empty($error['fourreau'])) { echo ($error['fourreau']); } ?></span><br />
+        <label class="intitule" for="notice">Notice :</label>
+        <select name="notice" value="">
+          <option value="">---Choisir---</option>
+          <option value="Present" <?php if (!empty($_POST['notice']) && $_POST['notice'] === 'Present') { echo 'selected'; } ?>>Present</option>
+          <option value="Absent" <?php if (!empty($_POST['notice']) && $_POST['notice'] === 'Absent') { echo 'selected'; } ?>>Absent</option>
+          <option value="Reproduction" <?php if (!empty($_POST['notice']) && $_POST['notice'] === 'Reproduction') { echo 'selected'; } ?>>Reproduction</option>
+          <option value="Non Concerné" <?php if (!empty($_POST['notice']) && $_POST['notice'] === 'Non Concerné') { echo 'selected'; } ?>>Non concerné</option>
+        </select><br>
+        <div class="spacer"></div>
+        <span class="error"><?php if (!empty($error['notice'])) { echo ($error['notice']); } ?></span><br />
 
-      <label class="intitule" for="cale">Cale :</label>
-      <select name="cale" value="">
-        <option value="">---Choisir---</option>
-        <option value="Present" <?php if (!empty($_POST['cale']) && $_POST['cale'] === 'Present') { echo 'selected'; } ?>>Present</option>
-        <option value="Absent" <?php if (!empty($_POST['cale']) && $_POST['cale'] === 'Absent') { echo 'selected'; } ?>>Absent</option>
-        <option value="Reproduction" <?php if (!empty($_POST['cale']) && $_POST['cale'] === 'Reproduction') { echo 'selected'; } ?>>Reproduction</option>
-        <option value="Non Concerné" <?php if (!empty($_POST['cale']) && $_POST['cale'] === 'Non Concerné') { echo 'selected'; } ?>>Non concerné</option>
-      </select><br>
-      <div class="spacer"></div>
-      <span class="error"><?php if (!empty($error['cale'])) { echo ($error['cale']); } ?></span><br />
+        <label class="intitule" for="fourreau">Fourreau :</label>
+        <select name="fourreau" value="">
+          <option value="">---Choisir---</option>
+          <option value="Nintendo" <?php if (!empty($_POST['fourreau']) && $_POST['fourreau'] === 'Nintendo') { echo 'selected'; } ?>>Nintendo</option>
+          <option value="Black" <?php if (!empty($_POST['fourreau']) && $_POST['fourreau'] === 'Black') { echo 'selected'; } ?>>Black</option>
+          <option value="Absent" <?php if (!empty($_POST['fourreau']) && $_POST['fourreau'] === 'Absent') { echo 'selected'; } ?>>Absent</option>
+          <option value="Non Concerné" <?php if (!empty($_POST['fourreau']) && $_POST['fourreau'] === 'Non Concerné') { echo 'selected'; } ?>>Non concerné</option>
+        </select><br>
+        <div class="spacer"></div>
+        <span class="error"><?php if (!empty($error['fourreau'])) { echo ($error['fourreau']); } ?></span><br />
 
-      <label class="intitule" for="note">Note :</label><br>
-      <textarea name="note" rows="4" cols="21" placeholder="Note"></textarea><br>
+        <label class="intitule" for="cale">Cale :</label>
+        <select name="cale" value="">
+          <option value="">---Choisir---</option>
+          <option value="Present" <?php if (!empty($_POST['cale']) && $_POST['cale'] === 'Present') { echo 'selected'; } ?>>Present</option>
+          <option value="Absent" <?php if (!empty($_POST['cale']) && $_POST['cale'] === 'Absent') { echo 'selected'; } ?>>Absent</option>
+          <option value="Reproduction" <?php if (!empty($_POST['cale']) && $_POST['cale'] === 'Reproduction') { echo 'selected'; } ?>>Reproduction</option>
+          <option value="Non Concerné" <?php if (!empty($_POST['cale']) && $_POST['cale'] === 'Non Concerné') { echo 'selected'; } ?>>Non concerné</option>
+        </select><br>
+        <div class="spacer"></div>
+        <span class="error"><?php if (!empty($error['cale'])) { echo ($error['cale']); } ?></span><br />
 
-      <div class="btn">
-        <input type="submit" name="submit" value="Enregistrer">
-      </div>
+        <label class="intitule" for="note">Note :</label><br>
+        <textarea name="note" rows="4" cols="21" placeholder="Note"></textarea><br>
 
-    </form>
-  </div>
-<?php } ?>
+        <div class="btn">
+          <input type="submit" name="submit" value="Enregistrer">
+        </div>
+
+      </form>
+    </div>
+<?php }
+} else {
+  echo '<div class="center"><a href="connexion.php">Se connecter</a></div>';
+}?>
 
 <?php include 'include/footer.php'; ?>
