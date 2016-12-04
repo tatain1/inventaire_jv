@@ -1,7 +1,5 @@
    <footer>
      <img class="point" src="./image/point.jpg" alt="" />
-     <a href="connexion.php">Se connecter</a>
-     <img class="point" src="./image/point.jpg" alt="" />
      <a href="corbeille.php">Acces à la corbeille</a>
      <img class="point" src="./image/point.jpg" alt="" />
      <a href="ajoutTest.php">Formulaire test</a>
